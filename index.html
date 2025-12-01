@@ -13,22 +13,25 @@
 <body>
   <header>
     <nav class="navbar">
-      <div class="logo">
-        <a href="index.html">FlowTrack Pro</a>
+      <div class="logo" data-no-translate>
+        <a href="index.html" data-no-translate>FlowTrack Pro</a>
       </div>
+
       <ul class="nav-links">
-        <li><a href="index.html">Startseite</a></li>
-        <li><a href="about.html">Über uns</a></li>
-        <li><a href="license.html">Lizenz</a></li>
-        <li><a href="datenschutz.html">Datenschutz</a></li>
-        <li><a href="impressum.html">Impressum</a></li>
-        <li><a href="barrierefreiheit.html">Barrierefreiheit</a></li>
-        <li><a href="kontakt.html">Kontakt</a></li>
+        <li><a href="index.html" data-i18n="nav.home">Startseite</a></li>
+        <li><a href="about.html" data-i18n="nav.about">Über uns</a></li>
+        <li><a href="kontakt.html" data-i18n="nav.contact">Kontakt</a></li>
       </ul>
+
+      <div class="header-controls" aria-hidden="false">
+        <button id="lang-toggle" class="control-btn" aria-pressed="false" aria-label="Sprache wechseln">EN</button>
+        <button id="theme-toggle" class="control-btn" aria-pressed="false" aria-label="Design wechseln">☾</button>
+      </div>
+
     </nav>
   </header>
 
-  <main>
+  <main id="main">
     <div class="hero">
       <h1>Steigere deine </br>Produktivität </br><div class="highlighted"> mit FlowTrack Pro</div></h1>
       <p>Die All-in-One Workflow- und Produktivitätssoftware für Studierende, Einzelunternehmer und kleine Teams.</p>
@@ -84,8 +87,22 @@
     </section>
   </main>
 
-  <footer>
-    <p>© 2025 FlowTech Innovations GmbH — Alle Rechte vorbehalten.</p>
+  <footer role="contentinfo" aria-label="Seitenfuss">
+    <div class="footer-inner">
+      <nav aria-label="Wichtige Links">
+        <ul class="footer-links">
+          <li><a href="about.html" data-i18n="footer.about">Über uns</a></li>
+          <li><a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a></li>
+          <li><a href="impressum.html" data-i18n="footer.imprint">Impressum</a></li>
+          <li><a href="barrierefreiheit.html" data-i18n="footer.accessibility">Barrierefreiheit</a></li>
+          <li><a href="kontakt.html" data-i18n="footer.contact">Kontakt</a></li>
+          <li><a href="license.html" data-i18n="footer.license">Lizenz</a></li>
+        </ul>
+      </nav>
+      <p class="footer-copy" data-i18n="footer.copy">© 2025 FlowTech Innovations GmbH — Alle Rechte vorbehalten.</p>
+    </div>
   </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>

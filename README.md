@@ -85,6 +85,16 @@ See the [Copyright & Licenses](copyright.html) page for complete documentation.
 
 Simply open `index.html` in a web browser to view the webshop. No build process or server required.
 
+## Language & Theme (added)
+
+- The site includes a language toggle in the header that switches between German and English. A small client-side translation helper is implemented in `js/main.js` and uses `data-i18n` attributes to find translatable strings.
+- By default the project uses a lightweight fallback dictionary. To enable automated translation using Google Cloud Translation API, set your API key in `js/main.js` in the `GOOGLE_TRANSLATE_API_KEY` variable.
+- Important security note: embedding a Google API key in client-side code will expose it publicly. For production, implement a small server-side proxy or Cloud Function that keeps the key secret and forwards translation requests.
+
+## Theme
+
+- A light/dark theme toggle is present in the header and persists the choice in `localStorage`.
+
 ## License
 
 © 2024 FlowTrack. All rights reserved.

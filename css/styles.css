@@ -39,7 +39,6 @@ html, body {
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
 a {
@@ -57,6 +56,12 @@ main {
   flex-direction: column;
   gap: 100px;
   animation: fadeIn 0.4s ease;
+}
+
+#main-content {
+  padding: 80px 0;
+  align-items: center;
+  justify-items: center;
 }
 
 @keyframes fadeIn {
@@ -88,7 +93,7 @@ main {
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 40px;
   padding: 0;
   margin: 0;
 }
@@ -220,7 +225,7 @@ button:hover {
    Kontaktformular
 ========================== */
 .contact-form {
-  max-width: 550px;
+  min-width: 400px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -267,4 +272,93 @@ font-size: var(--h1-size);
 font-weight: 500;
 color: #black;
 max-width: 800px;
+}
+
+/* ==========================
+   Header controls (language/theme)
+   ========================== */
+.header-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.control-btn {
+  background: var(--control-bg, rgba(0,0,0,0.04));
+  color: var(--control-color, var(--text-dark));
+  border: 1px solid var(--gray-border);
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.control-btn:hover,
+.control-btn:focus {
+  background: var(--control-hover, rgba(0,0,0,0.08));
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* Footer layout */
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.footer-links {
+  list-style: none;
+  display: flex;
+  gap: 18px;
+  padding: 0;
+  margin: 0 0 8px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.footer-links a {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+.footer-copy {
+  color: #69707a;
+  font-size: 0.95rem;
+}
+
+/* ==========================
+   Dark theme variables
+   ========================== */
+body.dark-theme {
+  --primary: #4da3ff;
+  --primary-dark: #6fbfff;
+  --accent: #3ecf8e;
+  --accent-dark: #33b37a;
+  --text-dark: #E6EEF6;
+  --gray-light: #0b1220;
+  --gray-border: rgba(255,255,255,0.08);
+  background: #071223;
+  color: var(--text-dark);
+}
+
+/* control colors in dark theme */
+body.dark-theme {
+  --control-bg: rgba(255,255,255,0.04);
+  --control-hover: rgba(255,255,255,0.08);
+  --control-color: var(--text-dark);
+}
+
+/* control colors in light theme */
+:root {
+  --control-bg: rgba(0,0,0,0.04);
+  --control-hover: rgba(0,0,0,0.08);
+  --control-color: var(--text-dark);
+}
+
+/* Accessible focus outline for keyboard users */
+:focus {
+  outline: 3px solid rgba(0,82,204,0.18);
+  outline-offset: 2px;
 }

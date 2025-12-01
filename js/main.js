@@ -149,6 +149,239 @@
         });
     }
 
+    /* Theme switching (light / dark) */
+    function applyTheme(theme) {
+        const body = document.body;
+        const themeToggle = document.getElementById('theme-toggle');
+        if (theme === 'dark') {
+            body.classList.add('dark-theme');
+            if (themeToggle) themeToggle.setAttribute('aria-pressed', 'true');
+        } else {
+            body.classList.remove('dark-theme');
+            if (themeToggle) themeToggle.setAttribute('aria-pressed', 'false');
+        }
+        try { localStorage.setItem('site-theme', theme); } catch (e) {}
+    }
+
+    function initThemeToggle() {
+        const toggle = document.getElementById('theme-toggle');
+        if (!toggle) return;
+        const saved = (localStorage.getItem('site-theme') || 'light');
+        applyTheme(saved);
+
+        toggle.addEventListener('click', function() {
+            const isDark = document.body.classList.contains('dark-theme');
+            const next = isDark ? 'light' : 'dark';
+            applyTheme(next);
+            // update label/icon
+            toggle.textContent = next === 'dark' ? '☾' : '☼';
+        });
+    }
+
+    /* Language switching using Google Translate REST API (client-side placeholder)
+       NOTE: Calling Google Cloud Translate API directly from client exposes your API key.
+       For production, use a server-side proxy or Cloud Function to keep keys secret.
+    */
+    const GOOGLE_TRANSLATE_API_KEY = ''; // <-- Add your API key here or better: use server proxy
+
+    // Store individual text nodes / elements for translation and originals
+    const i18nEntries = [];
+    const originals = {}; // key -> original German text (preserve)
+
+    // Collect all visible text nodes across the page and prepare entries
+    // to translate individual text nodes (preserves HTML structure).
+    function collectI18n() {
+        i18nEntries.length = 0;
+
+        // First collect block elements (h1..h6, p) so we translate whole headings/paragraphs
+        const blocks = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6,p'));
+        let idx = 0;
+        blocks.forEach(function(el) {
+            if (!el || !el.textContent) return;
+            if (el.closest && el.closest('[data-no-translate]')) return;
+            const text = el.textContent.trim();
+            if (!text || text.length < 2) return;
+            const key = 'block_' + (idx++);
+            i18nEntries.push({ key: key, type: 'element', el: el, text: text });
+            if (!(key in originals)) originals[key] = text;
+        });
+
+        // Then collect remaining inline text nodes, skipping those inside blocks we already captured
+        const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode: function(node) {
+                    if (!node || !node.nodeValue) return NodeFilter.FILTER_REJECT;
+                    const txt = node.nodeValue.trim();
+                    if (!txt) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            },
+            false
+        );
+
+        while (walker.nextNode()) {
+            const node = walker.currentNode;
+            const parent = node.parentElement;
+            if (!parent) continue;
+
+            const tag = parent.tagName ? parent.tagName.toLowerCase() : '';
+            if (['script','style','noscript','code','pre'].includes(tag)) continue;
+            if (parent.closest && parent.closest('svg')) continue;
+            if (parent.matches && parent.matches('input,textarea,select')) continue;
+            if (parent.closest && parent.closest('[data-no-translate]')) continue;
+            if (parent.isContentEditable) continue;
+
+            // Skip nodes inside block elements already captured
+            if (parent.closest && parent.closest('h1,h2,h3,h4,h5,h6,p')) continue;
+
+            const text = node.nodeValue.trim();
+            if (text.length < 2) continue;
+            if (/^[0-9\W]+$/.test(text)) continue;
+
+            const key = 'inline_' + (idx++);
+            i18nEntries.push({ key: key, type: 'node', node: node, text: node.nodeValue });
+            if (!(key in originals)) originals[key] = node.nodeValue;
+        }
+    }
+
+    async function translateBatch(texts, target) {
+        // Try proxy first (same-origin /translate or configured TRANSLATE_PROXY_URL)
+        const proxyUrl = (window.TRANSLATE_PROXY_URL || '/translate');
+        try {
+            const res = await fetch(proxyUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ q: texts, target: target, format: 'text' })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                // Proxy returns Google API response; normalize
+                if (data && data.data && data.data.translations) {
+                    return data.data.translations.map(t => t.translatedText);
+                }
+                // If proxy returned already-translated list
+                if (Array.isArray(data.translations)) {
+                    return data.translations;
+                }
+            } else {
+                // If proxy exists but returned error, fall through to direct API attempt
+                console.warn('Translate proxy responded with', res.status);
+            }
+        } catch (err) {
+            // network/proxy not available — we'll try direct API below if possible
+            console.info('Translate proxy unavailable, will try direct API if key present');
+        }
+
+        // Fallback: direct Google Translate API (will expose API key client-side)
+        if (!GOOGLE_TRANSLATE_API_KEY) {
+            return Promise.reject(new Error('No translation proxy available and no client API key configured'));
+        }
+        const endpoint = 'https://translation.googleapis.com/language/translate/v2?key=' + encodeURIComponent(GOOGLE_TRANSLATE_API_KEY);
+        const body = JSON.stringify({ q: texts, target: target, format: 'text' });
+
+        const res2 = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: body
+        });
+        if (!res2.ok) throw new Error('Translate API error: ' + res2.status);
+        const data2 = await res2.json();
+        if (!data2 || !data2.data || !data2.data.translations) throw new Error('Unexpected translate response');
+        return data2.data.translations.map(t => t.translatedText);
+    }
+
+    // Lightweight fallback dictionary for basic UI strings (when no API key available)
+    const quickFallback = {
+        'Startseite': 'Home',
+        'Über uns': 'About',
+        'Lizenz': 'License',
+        'Datenschutz': 'Privacy',
+        'Impressum': 'Imprint',
+        'Barrierefreiheit': 'Accessibility',
+        'Kontakt': 'Contact',
+        '© 2025 FlowTech Innovations GmbH — Alle Rechte vorbehalten.': '© 2025 FlowTech Innovations GmbH — All rights reserved.'
+    };
+
+    async function translatePage(target) {
+        // Ensure we have a snapshot of the page strings
+        collectI18n();
+        const entries = i18nEntries.slice();
+
+        // Build array of original texts (use preserved originals when available)
+        const originalsList = entries.map(function(e) {
+            return originals[e.key] || e.text || '';
+        });
+
+        // If user requests German, restore originals
+        if (target === 'de') {
+            entries.forEach(function(entry, idx) {
+                const original = originals[entry.key] || entry.text;
+                if (entry.type === 'element' && entry.el) entry.el.textContent = original;
+                else if (entry.type === 'node' && entry.node) entry.node.nodeValue = original;
+            });
+            try { localStorage.setItem('site-lang', target); } catch (e) {}
+            return;
+        }
+
+        // If no API key, apply quickFallback where possible, otherwise leave original
+        if (!GOOGLE_TRANSLATE_API_KEY) {
+            entries.forEach(function(entry) {
+                const original = originals[entry.key] || entry.text;
+                const fallback = quickFallback[ original.trim() ];
+                const out = (target === 'en' && fallback) ? fallback : original;
+                if (entry.type === 'element' && entry.el) entry.el.textContent = out;
+                else if (entry.type === 'node' && entry.node) entry.node.nodeValue = out;
+            });
+            try { localStorage.setItem('site-lang', target); } catch (e) {}
+            return;
+        }
+
+        try {
+            const translated = await translateBatch(originalsList, target);
+            translated.forEach(function(text, idx) {
+                const entry = entries[idx];
+                if (!entry) return;
+                if (entry.type === 'element' && entry.el) entry.el.textContent = text;
+                else if (entry.type === 'node' && entry.node) entry.node.nodeValue = text;
+            });
+            try { localStorage.setItem('site-lang', target); } catch (e) {}
+        } catch (err) {
+            console.warn('Translation failed, falling back to originals.', err);
+            entries.forEach(function(entry) {
+                const original = originals[entry.key] || entry.text;
+                const fallback = quickFallback[ original.trim() ];
+                const out = (target === 'en' && fallback) ? fallback : original;
+                if (entry.type === 'element' && entry.el) entry.el.textContent = out;
+                else if (entry.type === 'node' && entry.node) entry.node.nodeValue = out;
+            });
+        }
+    }
+
+    function initLangToggle() {
+        collectI18n();
+        const toggle = document.getElementById('lang-toggle');
+        if (!toggle) return;
+        const saved = (localStorage.getItem('site-lang') || 'de');
+        // set initial state
+        toggle.setAttribute('aria-pressed', saved === 'en' ? 'true' : 'false');
+        toggle.textContent = saved === 'en' ? 'DE' : 'EN';
+
+        if (saved !== 'de') {
+            translatePage(saved);
+        }
+
+        toggle.addEventListener('click', function() {
+            const isEn = toggle.getAttribute('aria-pressed') === 'true';
+            const next = isEn ? 'de' : 'en';
+            toggle.setAttribute('aria-pressed', (!isEn).toString());
+            toggle.textContent = next === 'en' ? 'DE' : 'EN';
+            translatePage(next);
+        });
+    }
+
     // Initialize all functionality when DOM is ready
     function init() {
         createLiveRegion();
@@ -157,6 +390,8 @@
         initNewsletterForm();
         initAddToCart();
         initKeyboardNav();
+        initThemeToggle();
+        initLangToggle();
     }
 
     // Run initialization

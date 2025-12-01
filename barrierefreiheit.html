@@ -1,43 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FlowTrack Webshop Accessibility Statement - Our commitment to digital accessibility for all users">
-    <title>Accessibility Statement - FlowTrack Webshop</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-</head>
-<body><!-- barrierefreiheit.html -->
+<!-- barrierefreiheit.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barrierefreiheit – FlowTrack Pro</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <header>
     <nav class="navbar">
-      <div class="logo">
-        <a href="index.html">FlowTrack Pro</a>
+      <div class="logo" data-no-translate>
+        <a href="index.html" data-no-translate>FlowTrack Pro</a>
       </div>
+
       <ul class="nav-links">
         <li><a href="index.html">Startseite</a></li>
         <li><a href="about.html">Über uns</a></li>
-        <li><a href="license.html">Lizenz</a></li>
-        <li><a href="datenschutz.html">Datenschutz</a></li>
-        <li><a href="impressum.html">Impressum</a></li>
-        <li><a href="barrierefreiheit.html">Barrierefreiheit</a></li>
         <li><a href="kontakt.html">Kontakt</a></li>
       </ul>
+
+      <div class="header-controls" aria-hidden="false">
+        <button id="lang-toggle" class="control-btn" aria-pressed="false" aria-label="Sprache wechseln">EN</button>
+        <button id="theme-toggle" class="control-btn" aria-pressed="false" aria-label="Design wechseln">☾</button>
+      </div>
     </nav>
   </header>
 
-  <main class="page">
+  <main id="main-content" class="page">
     <h1>Erklärung zur Barrierefreiheit</h1>
     <p>FlowTech Innovations GmbH ist bemüht, ihre Website im Einklang mit der Richtlinie (EU) 2016/2102 sowie dem Web-Zugänglichkeits-Gesetz (WZG) barrierefrei zugänglich zu machen.</p>
 
@@ -58,9 +48,23 @@
     E-Mail: accessibility@flowtech-innovations.com</p>
   </main>
 
-  <footer>
-    <p>© 2025 FlowTech Innovations GmbH</p>
+  <footer role="contentinfo" aria-label="Seitenfuss">
+    <div class="footer-inner">
+      <nav aria-label="Wichtige Links">
+        <ul class="footer-links">
+          <li><a href="about.html">Über uns</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="barrierefreiheit.html">Barrierefreiheit</a></li>
+          <li><a href="kontakt.html">Kontakt</a></li>
+          <li><a href="license.html">Lizenz</a></li>
+        </ul>
+      </nav>
+      <p class="footer-copy">© 2025 FlowTech Innovations GmbH — Alle Rechte vorbehalten.</p>
+    </div>
   </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
 

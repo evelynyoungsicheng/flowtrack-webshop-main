@@ -10,20 +10,24 @@
 <body>
   <header>
     <nav class="navbar">
-      <div class="logo">FlowTrack Pro</div>
+      <div class="logo" data-no-translate>
+        <a href="index.html" data-no-translate>FlowTrack Pro</a>
+      </div>
+
       <ul class="nav-links">
         <li><a href="index.html">Startseite</a></li>
         <li><a href="about.html">Über uns</a></li>
-        <li><a href="license.html">Lizenz</a></li>
-        <li><a href="datenschutz.html">Datenschutz</a></li>
-        <li><a href="impressum.html">Impressum</a></li>
-        <li><a href="barrierefreiheit.html">Barrierefreiheit</a></li>
         <li><a href="kontakt.html">Kontakt</a></li>
       </ul>
+
+      <div class="header-controls" aria-hidden="false">
+        <button id="lang-toggle" class="control-btn" aria-pressed="false" aria-label="Sprache wechseln">EN</button>
+        <button id="theme-toggle" class="control-btn" aria-pressed="false" aria-label="Design wechseln">☾</button>
+      </div>
     </nav>
   </header>
 
-  <main class="page">
+  <main id="main-content" class="page">
     <h1>Kontakt</h1>
     <form class="contact-form">
       <label for="name">Name</label>
@@ -39,8 +43,22 @@
     </form>
   </main>
 
-  <footer>
-    <p>© 2025 FlowTech Innovations GmbH</p>
+  <footer role="contentinfo" aria-label="Seitenfuss">
+    <div class="footer-inner">
+      <nav aria-label="Wichtige Links">
+        <ul class="footer-links">
+          <li><a href="about.html">Über uns</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="barrierefreiheit.html">Barrierefreiheit</a></li>
+          <li><a href="kontakt.html">Kontakt</a></li>
+          <li><a href="license.html">Lizenz</a></li>
+        </ul>
+      </nav>
+      <p class="footer-copy">© 2025 FlowTech Innovations GmbH — Alle Rechte vorbehalten.</p>
+    </div>
   </footer>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
